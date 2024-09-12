@@ -19,8 +19,12 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Gods of Asgard")
 
 # Load soundtracks and sound effects
-pygame.mixer.music.load('amazing_soundtrack.mp3')  # Make sure you have the audio file
-pygame.mixer.music.play(-1)  # Loop background music
+def load_music(track):
+    pygame.mixer.music.load(track)
+    pygame.mixer.music.play(-1)  # Loop background music
+
+# Start with the new background music
+load_music('Trials of the Nine Worlds.mp3')
 
 # Character Data
 class Character(pygame.sprite.Sprite):
@@ -74,6 +78,11 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_TAB:
                 current_character = (current_character + 1) % 3  # Cycle through Odin, Loki, Thor
+            # Volume control
+            if event.key == pygame.K_PLUS or event.key == pygame.K_EQUALS:
+                pygame.mixer.music.set_volume(min(pygame.mixer.music.get_volume() + 0.1, 1.0))
+            if event.key == pygame.K_MINUS:
+                pygame.mixer.music.set_volume(max(pygame.mixer.music.get_volume() - 0.1, 0.0))
 
     # Movement
     keys = pygame.key.get_pressed()
