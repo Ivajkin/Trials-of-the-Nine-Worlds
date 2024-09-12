@@ -1,5 +1,7 @@
+import os
 import pygame
 import random
+import subprocess
 
 # Initialize Pygame
 pygame.init()
@@ -46,8 +48,18 @@ thor = Character("Thor", "thor.png", "Thunder Strike", 300, 500)
 characters = [odin, loki, thor]
 current_character = 0
 
+# Generate background if it doesn't exist
+if not os.path.exists("background.jpg"):
+    subprocess.run(["python", "generate_background.py"])
+
 # Load background image
-background = pygame.image.load("background.jpg").convert()
+try:
+    background = pygame.image.load("background.jpg").convert()
+except pygame.error as e:
+    print(f"Error loading background image: {e}")
+    print("Make sure 'background.jpg' is in the working directory.")
+    background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    background.fill(WHITE)  # Fallback to a white background
 
 # Game loop
 running = True
