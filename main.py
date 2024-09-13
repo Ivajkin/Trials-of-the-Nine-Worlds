@@ -15,8 +15,8 @@ SCREEN_HEIGHT = 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Character size (adjusted to be smaller)
-CHARACTER_SIZE = (48, 48)  # Reduced from 64x64
+# Character size
+CHARACTER_SIZE = (48, 48)
 
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -36,16 +36,14 @@ class Character(pygame.sprite.Sprite):
         super().__init__()
         self.name = name
         self.ability = ability
-        # Load and scale the image
-        original_image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(original_image, CHARACTER_SIZE)
+        self.original_image = pygame.image.load(image_path).convert_alpha()
+        self.image = pygame.transform.scale(self.original_image, CHARACTER_SIZE)
         self.rect = self.image.get_rect()
         self.rect.topleft = self.get_initial_position()
         self.cooldown = 0
         self.max_cooldown = 60  # 1 second at 60 FPS
 
     def get_initial_position(self):
-        # Define specific positions for each character
         if self.name == "Odin":
             return (SCREEN_WIDTH // 2, SCREEN_HEIGHT - CHARACTER_SIZE[1] - 50)
         elif self.name == "Loki":
@@ -56,13 +54,31 @@ class Character(pygame.sprite.Sprite):
             return (random.randint(0, SCREEN_WIDTH - CHARACTER_SIZE[0]), 
                     random.randint(0, SCREEN_HEIGHT - CHARACTER_SIZE[1]))
 
-    def draw(self, surface):
-        # Draw character
-        surface.blit(self.image, self.rect)
+    def draw(self, surface, light_source):
+        # Calculate shadow position based on light source
+        shadow_offset_x = (self.rect.centerx - light_source[0]) // 10
+        shadow_offset_y = (self.rect.centery - light_source[1]) // 10
+
         # Draw shadow
         shadow_surface = pygame.Surface(CHARACTER_SIZE, pygame.SRCALPHA)
         shadow_surface.fill((0, 0, 0, 100))  # Semi-transparent black
-        surface.blit(shadow_surface, (self.rect.x, self.rect.y + CHARACTER_SIZE[1] - 5))
+        surface.blit(shadow_surface, (self.rect.x + shadow_offset_x, self.rect.y + shadow_offset_y))
+
+        # Apply lighting effect to character
+        lit_image = self.apply_lighting(light_source)
+        surface.blit(lit_image, self.rect)
+
+    def apply_lighting(self, light_source):
+        lit_image = self.image.copy()
+        for x in range(CHARACTER_SIZE[0]):
+            for y in range(CHARACTER_SIZE[1]):
+                distance = ((x - CHARACTER_SIZE[0]//2)**2 + (y - CHARACTER_SIZE[1]//2)**2)**0.5
+                max_distance = (CHARACTER_SIZE[0]**2 + CHARACTER_SIZE[1]**2)**0.5 / 2
+                light_intensity = 1 - (distance / max_distance)
+                color = lit_image.get_at((x, y))
+                lit_color = [int(c * light_intensity) for c in color[:3]] + [color[3]]
+                lit_image.set_at((x, y), lit_color)
+        return lit_image
 
     def use_ability(self, game):
         if self.cooldown == 0:
@@ -154,6 +170,7 @@ def draw_fog():
 # Game loop
 running = True
 clock = pygame.time.Clock()
+light_source = [SCREEN_WIDTH // 2, 0]  # Light coming from top center
 
 while running:
     for event in pygame.event.get():
@@ -188,9 +205,9 @@ while running:
     draw_fog()
     screen.blit(fog_surface, (0, 0))
     
-    # Draw all characters
+    # Draw all characters with lighting and shadows
     for character in characters:
-        character.draw(screen)
+        character.draw(screen, light_source)
 
     pygame.display.flip()
     clock.tick(30)
