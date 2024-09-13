@@ -1,0 +1,32 @@
+User Stories for Top 3 JTBD
+Now, we’ll create User Stories for the top 3 JTBD.
+
+User Story 1: Efficient Character Integration "As a game designer, I want characters to blend seamlessly with the landscape so that the game environment feels immersive for the players."
+
+User Story 2: Improve In-Game Asset Loading "As a game developer, I want to optimize asset loading times so that the game runs smoothly and players don't experience delays or stuttering."
+
+User Story 3: Optimize Visual Feedback Loops "As a visual artist, I want real-time rendering feedback so that I can identify visual issues and iterate quickly to improve the quality of in-game assets."
+
+Step 4: Evaluate User Stories by WSJF
+User Story	BV	TC	RR/OE	C	WSJF
+1. Efficient Character Integration	8	7	6	3	7.00
+2. Improve In-Game Asset Loading	9	8	7	4	6.00
+3. Optimize Visual Feedback Loops	7	6	6	5	3.80
+Top User Story by WSJF: Efficient Character Integration (WSJF = 7.00)
+
+Step 5: Acceptance Criteria (AC) for Each User Story
+User Story 1: Efficient Character Integration
+AC1: Characters should cast realistic shadows on the environment, which change dynamically based on lighting conditions.
+AC2: Characters should appear naturally embedded in the environment with matching color grading, lighting, and depth.
+AC3: Ensure that character sprites do not appear "pasted on" by adjusting their scale to fit within the environment naturally.
+AC4: Character movement should interact with environmental elements (e.g., water, grass, rocks).
+User Story 2: Improve In-Game Asset Loading
+AC1: Asset loading times must not exceed 2 seconds for large assets.
+AC2: Implement lazy loading or background loading of assets when transitioning between levels or game states.
+AC3: Introduce asset compression and memory management techniques to reduce loading times by 30%.
+AC4: Conduct performance testing to ensure loading times are consistently optimized across different hardware configurations.
+User Story 3: Optimize Visual Feedback Loops
+AC1: Implement real-time rendering feedback for all visual elements, showing changes to lighting, textures, or character placement immediately in the game engine.
+AC2: Ensure the rendering pipeline is efficient, with feedback loops running under 0.5 seconds per visual change.
+AC3: Enable dynamic scaling or automatic adjustments to prevent rendering lag or overuse of GPU resources.
+AC4: Provide visual comparison tools within the editor to compare different rendering iterations side by side.

@@ -1,0 +1,39 @@
+JTBD (Jobs to Be Done)
+Here are five JTBD that could align with a project like "Gods of Asgard" or another tech-oriented development:
+
+JTBD 1: Efficient Character Integration
+"When designing in-game environments, I want to seamlessly integrate characters into the landscape so that the scene feels cohesive and immersive for players."
+
+JTBD 2: Streamline Multitasking
+"When working across multiple tools (design, code, task management), I want to minimize clutter and distractions so that I can efficiently switch tasks and focus on high-priority work."
+
+JTBD 3: Optimize Visual Feedback Loops
+"When developing visual assets (e.g., character sprites or environments), I want real-time feedback on rendering quality and integration issues so that I can quickly iterate and improve asset quality."
+
+JTBD 4: Improve In-Game Asset Loading
+"When loading assets into the game engine, I want fast and optimized processes to reduce waiting time and avoid performance bottlenecks during gameplay."
+
+JTBD 5: Enhance Team Collaboration
+"When collaborating with team members remotely, I want clear communication and version control so that the team can stay aligned, avoid miscommunication, and track changes effectively."
+
+Evaluate JTBD by WSJF (Weighted Shortest Job First)
+WSJF prioritization is calculated by dividing the value a feature brings by its cost to implement. Here's how we can estimate WSJF:
+
+Business Value (BV): How important is this task for the project's success?
+Time Criticality (TC): How urgent is it to deliver this feature?
+Risk Reduction/Opportunity Enablement (RR/OE): How much risk does it reduce or opportunity does it create?
+Effort/Cost (C): The complexity and time needed to implement the task.
+Formula: WSJF = (BV + TC + RR/OE) / C
+
+JTBD	BV	TC	RR/OE	C	WSJF
+1. Efficient Character Integration	8	6	7	3	7.00
+2. Streamline Multitasking	6	5	6	4	4.25
+3. Optimize Visual Feedback Loops	7	7	8	5	4.40
+4. Improve Asset Loading	9	9	7	4	6.25
+5. Enhance Team Collaboration	8	8	9	6	4.17
+Top 3 JTBD (Based on WSJF):
+JTBD 1: Efficient Character Integration (WSJF = 7.00)
+JTBD 4: Improve In-Game Asset Loading (WSJF = 6.25)
+JTBD 3: Optimize Visual Feedback Loops (WSJF = 4.40)
+
+

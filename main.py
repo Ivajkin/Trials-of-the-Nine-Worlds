@@ -2,6 +2,7 @@ import os
 import pygame
 import random
 import subprocess
+from pygame import gfxdraw
 
 # Initialize Pygame
 pygame.init()
@@ -14,8 +15,8 @@ SCREEN_HEIGHT = 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Character size
-CHARACTER_SIZE = (64, 64)  # Adjust this size as needed for your game
+# Character size (adjusted to be smaller)
+CHARACTER_SIZE = (48, 48)  # Reduced from 64x64
 
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -39,10 +40,29 @@ class Character(pygame.sprite.Sprite):
         original_image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(original_image, CHARACTER_SIZE)
         self.rect = self.image.get_rect()
-        self.rect.topleft = (random.randint(0, SCREEN_WIDTH - CHARACTER_SIZE[0]), 
-                             random.randint(0, SCREEN_HEIGHT - CHARACTER_SIZE[1]))
+        self.rect.topleft = self.get_initial_position()
         self.cooldown = 0
         self.max_cooldown = 60  # 1 second at 60 FPS
+
+    def get_initial_position(self):
+        # Define specific positions for each character
+        if self.name == "Odin":
+            return (SCREEN_WIDTH // 2, SCREEN_HEIGHT - CHARACTER_SIZE[1] - 50)
+        elif self.name == "Loki":
+            return (SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2)
+        elif self.name == "Thor":
+            return (3 * SCREEN_WIDTH // 4, SCREEN_HEIGHT // 3)
+        else:
+            return (random.randint(0, SCREEN_WIDTH - CHARACTER_SIZE[0]), 
+                    random.randint(0, SCREEN_HEIGHT - CHARACTER_SIZE[1]))
+
+    def draw(self, surface):
+        # Draw character
+        surface.blit(self.image, self.rect)
+        # Draw shadow
+        shadow_surface = pygame.Surface(CHARACTER_SIZE, pygame.SRCALPHA)
+        shadow_surface.fill((0, 0, 0, 100))  # Semi-transparent black
+        surface.blit(shadow_surface, (self.rect.x, self.rect.y + CHARACTER_SIZE[1] - 5))
 
     def use_ability(self, game):
         if self.cooldown == 0:
@@ -120,6 +140,17 @@ except pygame.error as e:
     background = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
     background.fill(WHITE)  # Fallback to a white background
 
+# Create a surface for the fog overlay
+fog_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+
+def draw_fog():
+    fog_surface.fill((0, 0, 0, 0))  # Clear the surface
+    for _ in range(100):
+        x = random.randint(0, SCREEN_WIDTH)
+        y = random.randint(SCREEN_HEIGHT // 2, SCREEN_HEIGHT)
+        radius = random.randint(20, 50)
+        gfxdraw.filled_circle(fog_surface, x, y, radius, (255, 255, 255, 5))
+
 # Game loop
 running = True
 clock = pygame.time.Clock()
@@ -153,9 +184,13 @@ while running:
     # Redraw background
     screen.blit(background, (0, 0))
     
+    # Draw fog
+    draw_fog()
+    screen.blit(fog_surface, (0, 0))
+    
     # Draw all characters
     for character in characters:
-        screen.blit(character.image, character.rect)
+        character.draw(screen)
 
     pygame.display.flip()
     clock.tick(30)
