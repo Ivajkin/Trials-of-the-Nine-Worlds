@@ -14,6 +14,9 @@ SCREEN_HEIGHT = 600
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+# Character size
+CHARACTER_SIZE = (64, 64)  # Adjust this size as needed for your game
+
 # Create the screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Gods of Asgard")
@@ -28,25 +31,76 @@ load_music('Trials of the Nine Worlds.mp3')
 
 # Character Data
 class Character(pygame.sprite.Sprite):
-    def __init__(self, name, image_path, ability, x, y):
+    def __init__(self, name, ability, image_path):
         super().__init__()
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x, y)
+        self.name = name
         self.ability = ability
-        self.health = 100
-    
+        # Load and scale the image
+        original_image = pygame.image.load(image_path).convert_alpha()
+        self.image = pygame.transform.scale(original_image, CHARACTER_SIZE)
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (random.randint(0, SCREEN_WIDTH - CHARACTER_SIZE[0]), 
+                             random.randint(0, SCREEN_HEIGHT - CHARACTER_SIZE[1]))
+        self.cooldown = 0
+        self.max_cooldown = 60  # 1 second at 60 FPS
+
+    def use_ability(self, game):
+        if self.cooldown == 0:
+            if self.name == "Odin":
+                self.teleport()
+            elif self.name == "Loki":
+                self.create_illusion(game)
+            elif self.name == "Thor":
+                self.thunder_strike(game)
+            self.cooldown = self.max_cooldown
+            print(f"{self.name} uses {self.ability}")
+        else:
+            print(f"{self.name}'s ability is on cooldown")
+
+    def teleport(self):
+        # Teleport Odin a short distance
+        dx = random.randint(-100, 100)
+        dy = random.randint(-100, 100)
+        self.rect.x += dx
+        self.rect.y += dy
+        # Ensure Odin stays within screen bounds
+        self.rect.clamp_ip(pygame.display.get_surface().get_rect())
+
+    def create_illusion(self, game):
+        # Create a temporary clone of Loki
+        illusion = Character("Loki's Illusion", "None", "loki.png")
+        illusion.rect.topleft = (self.rect.x + random.randint(-50, 50), 
+                                 self.rect.y + random.randint(-50, 50))
+        game.all_sprites.add(illusion)
+        # Remove the illusion after 3 seconds
+        pygame.time.set_timer(pygame.USEREVENT, 3000, once=True)
+
+    def thunder_strike(self, game):
+        # Create a thunder effect and damage nearby enemies
+        thunder = pygame.Surface((200, 200), pygame.SRCALPHA)
+        pygame.draw.circle(thunder, (255, 255, 0, 128), (100, 100), 100)
+        game.screen.blit(thunder, (self.rect.centerx - 100, self.rect.centery - 100))
+        pygame.display.flip()
+        # Check for nearby enemies and damage them
+        for sprite in game.all_sprites:
+            if isinstance(sprite, Enemy) and self.rect.colliderect(sprite.rect):
+                sprite.take_damage(50)
+
+    def update(self):
+        if self.cooldown > 0:
+            self.cooldown -= 1
+
     def move(self, dx=0, dy=0):
         self.rect.x += dx
         self.rect.y += dy
-    
-    def use_ability(self):
-        print(f"{self.name} uses {self.ability}")
+        # Ensure the character stays within screen bounds
+        screen_rect = pygame.display.get_surface().get_rect()
+        self.rect.clamp_ip(screen_rect)
 
 # Create characters: Odin, Loki, Thor
-odin = Character("Odin", "odin.png", "Teleportation", 100, 500)
-loki = Character("Loki", "loki.png", "Illusion", 200, 500)
-thor = Character("Thor", "thor.png", "Thunder Strike", 300, 500)
+odin = Character("Odin", "Teleportation", "odin.png")
+loki = Character("Loki", "Illusion", "loki.png")
+thor = Character("Thor", "Thunder Strike", "thor.png")
 
 # Group the characters
 characters = [odin, loki, thor]
@@ -56,9 +110,10 @@ current_character = 0
 if not os.path.exists("background.jpg"):
     subprocess.run(["python", "generate_background.py"])
 
-# Load background image
+# Load and scale background image
 try:
-    background = pygame.image.load("background.jpg").convert()
+    original_background = pygame.image.load("background.jpg").convert()
+    background = pygame.transform.scale(original_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 except pygame.error as e:
     print(f"Error loading background image: {e}")
     print("Make sure 'background.jpg' is in the working directory.")
